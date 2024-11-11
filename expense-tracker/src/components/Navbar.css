@@ -1,0 +1,15 @@
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px;
+  background: rgb(3, 22, 38);
+}
+.navbar-container nav {
+  display: flex;
+  gap: 50px;
+}
+.navbar-container nav .nav-link {
+  color: white;
+  font-weight: 700;
+}
