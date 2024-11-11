@@ -3,7 +3,7 @@ import React from "react";
 const Category = () => {
   return (
     <div className="category-by-type">
-      <h1>Filter Transactions</h1>
+      <h1 className="heading-big">Filter Transactions</h1>
       <div className="buttons">
         <button className="btn">Income</button>
         <button className="btn">Expenses</button>

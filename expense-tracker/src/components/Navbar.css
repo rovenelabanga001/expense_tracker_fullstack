@@ -13,3 +13,11 @@
   color: white;
   font-weight: 700;
 }
+.navbar-button-container button.btn {
+  background: rgb(230, 28, 5);
+  color: white;
+}
+.navbar-button-container button.btn:hover {
+  color: rgb(230, 28, 5);
+  background: white;
+}
