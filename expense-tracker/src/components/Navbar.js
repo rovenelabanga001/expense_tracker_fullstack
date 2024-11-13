@@ -6,8 +6,28 @@ const Navbar = () => {
   return (
     <div className="navbar-container">
       <nav>
-        <a className="nav-link">Home</a>
-        <a className="nav-link">Transactions</a>
+        <ul>
+          <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/transactions"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              Transactions
+            </NavLink>
+          </li>
+        </ul>
       </nav>
       <div className="navbar-button-container">
         <button className="btn">Log Out</button>

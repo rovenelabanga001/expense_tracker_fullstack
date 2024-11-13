@@ -37,6 +37,7 @@ code {
   background: rgb(230, 28, 5);
   color: white;
 }
+/* Home css starts here*/
 .category-by-type {
   display: flex;
   flex-direction: column;
@@ -72,4 +73,44 @@ code {
 }
 .table-container table tbody td {
   font-weight: 300;
+}
+
+/* Transactions page css starts here */
+.transaction-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+  padding: 20px;
+}
+.transaction-form-container form.transaction-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  gap: 30px;
+}
+.transaction-form-container form.transaction-form select,
+.transaction-form-container form.transaction-form input,
+.transaction-form-container form.transaction-form textarea {
+  width: 60%;
+  height: 40px;
+  background: rgba(244, 242, 242, 0.411);
+  border: none;
+  outline: none;
+  padding: 0 0 0 13px;
+  transition: 0.3s;
+}
+.transaction-form-container form.transaction-form textarea {
+  height: 60px;
+}
+.transaction-form-container form.transaction-form select:focus,
+.transaction-form-container form.transaction-form input:focus,
+.transaction-form-container form.transaction-form textarea:focus {
+  border: none;
+  border-bottom: 2px solid rgb(230, 28, 5);
 }

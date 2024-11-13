@@ -7,10 +7,16 @@ const routes = [
   {
     path: "/",
     element: <App />,
-  },
-  {
-    path: "/transactions",
-    element: <Transactions />,
+    children: [
+      {
+        path: "",
+        element: <Home />,
+      },
+      {
+        path: "/transactions",
+        element: <Transactions />,
+      },
+    ],
   },
 ];
 
