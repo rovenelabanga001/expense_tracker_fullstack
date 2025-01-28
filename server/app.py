@@ -63,6 +63,61 @@ def users():
             405
         )
 
+
+@app.route('/users/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+def user_by_id(id):
+    user = User.query.filter(User.id == id).first()
+
+    if user is None:
+        response_body = {
+            "error": "User not found"
+        }
+
+        response = make_response(
+            response_body,
+            404
+        )
+
+        return response
+
+    else:
+        if request.method == 'GET':
+            user_dict = user.to_dict()
+            response = make_response(user_dict, 200)
+            return response
+
+        elif request.method == 'PATCH':
+            data = request.get_json()
+
+            username = data.get('username')
+            password = data.get('password')
+
+            if username:
+                user.username = username
+            if password:
+                user.password = password
+
+            db.session.commit()
+
+            user_dict = user.to_dict()
+            response = make_response(user_dict,200)
+            return response
+
+        elif request.method == 'DELETE':
+            db.session.delete(user)
+            db.session.commit()
+
+            response_body = {
+                "message": "User deleted successfully"
+            }
+            
+            response = make_response(
+                response_body, 200
+            )
+
+            return response
+
+
 if __name__ == '__main__':
     app.run(port=555)
 
