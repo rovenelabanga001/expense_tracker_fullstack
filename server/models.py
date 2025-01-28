@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.associationproxy import association_proxy
 from datetime import datetime
 from sqlalchemy import inspect
 from sqlalchemy.orm import validates
@@ -18,7 +19,11 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
 
-    transactions = db.relationship('Transaction', back_populates='user')
+    transactions = db.relationship('Transaction', back_populates='user', cascade="all, delete-orphan", passive_deletes=True)
+    userbudgets = db.relationship('UserBudget', back_populates='user',cascade="all, delete-orphan", passive_deletes=True)
+
+    budgets = association_proxy('userbudgets', 'budget')
+    serialize_rules = ("-transactions.user", "-userbudgets.user")
 
     @validates('username')
     def validates_username(self, key, value):
@@ -60,8 +65,9 @@ class Transaction(db.Model, SerializerMixin):
     tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'))
 
     user = db.relationship('User', uselist=False, back_populates='transactions')
-    tag = db.relationship('Tag', uselist=False, back_populates='transactions')
-
+    tag = db.relationship('Tag', uselist=False, back_populates='transactions', passive_deletes=True)
+    
+    serialize_rules = ("-user.transactions", "-tag.transactions")
     @validates('transaction_type')
     def validates_transaction_type(self, key, value):
         if value not in ["Income", "Expense"]:
@@ -77,8 +83,10 @@ class Tag(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False, unique=True)
 
-    transactions = db.relationship('Transaction', back_populates='tag')
+    transactions = db.relationship('Transaction', back_populates='tag', cascade="all, delete-orphan", passive_deletes=True)
+    #passive deletes ensures ensures that when you delete a User or Tag, it will not throw errors due to the foreign key constraint
 
+    serialize_rules = ("-transactions.tag",)
     def __repr__(self):
         return f'<Tag: {self.id}, {self.name}>'
 
@@ -91,6 +99,10 @@ class Budget(db.Model, SerializerMixin):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
 
+    userbudgets = db.relationship('UserBudget', back_populates='budget', cascade ="all, delete-orphan", passive_deletes=True)
+
+    users = association_proxy('userbudgets', 'user')
+    serialize_rules = ("-userbudgets.budget",)
     def __repr__(self):
         return f'<Budget: {self.id}, name: {self.name}, amount: {self.amount}, start_date: {self.start_date}, end_date: {self.end_date}>'
 
@@ -100,8 +112,13 @@ class UserBudget(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contribution_amount = db.Column(db.Integer, nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    budget_id = db.Column(db.Integer, db.ForeignKey('budgets.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
+    budget_id = db.Column(db.Integer, db.ForeignKey('budgets.id', ondelete='CASCADE'))
+
+    user = db.relationship('User', back_populates='userbudgets')
+    budget = db.relationship('Budget', back_populates='userbudgets')
+
+    serialize_rules = ("-user.userbudgets", "-budget.userbudgets")
 
     def __repr__(self):
         return f'<UserBudget: {self.id}, amount: {self.contribution_amount}>'
