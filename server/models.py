@@ -7,3 +7,16 @@ metadata = MetaData(naming_convention={
 })
 
 db = SQLAlchemy(metadata=metadata)
+
+class User(db.Model, SerializerMixin):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return f'<User: {self.id}, {self.username}>'
+
+
+class Transaction(db.Model, SerializerMixin):

@@ -1,0 +1,45 @@
+/* Extra Large Devices (4K screens, ≥ 2560px) */
+@media only screen and (max-width: 2559.98px) {
+    /* Styles for extra large devices (4K) */
+  }
+  
+  /* Large Desktops (≥ 1920px and < 2560px) */
+  @media only screen and (max-width: 1919.98px) {
+    /* Styles for large desktops */
+  }
+  
+  /* Standard Desktops (≥ 1440px and < 1920px) */
+  @media only screen and (max-width: 1439.98px) {
+    /* Styles for standard desktops */
+  }
+  
+  /* Laptops (≥ 1280px and < 1440px) */
+  @media only screen and (max-width: 1279.98px) {
+    /* Styles for laptops */
+  }
+  
+  /* Large Tablets (≥ 1024px and < 1280px) */
+  @media only screen and (max-width: 1023.98px) {
+    /* Styles for large tablets */
+  }
+  
+  /* Medium Tablets (≥ 768px and < 1024px) */
+  @media only screen and (max-width: 767.98px) {
+    /* Styles for medium tablets */
+  }
+  
+  /* Small Tablets and Large Phones (≥ 600px and < 768px) */
+  @media only screen and (max-width: 599.98px) {
+    /* Styles for small tablets and large phones */
+  }
+  
+  /* Large Phones (≥ 480px and < 600px) */
+  @media only screen and (max-width: 479.98px) {
+    /* Styles for large phones */
+  }
+  
+  /* Small Phones (< 480px) */
+  @media only screen and (max-width: 479.98px) {
+    /* Styles for small phones */
+  }
+  
