@@ -1,0 +1,44 @@
+# General (applies to both client and server)
+.DS_Store
+Thumbs.db
+*.log
+
+# Node.js (client)
+client/node_modules/
+client/build/
+client/dist/
+client/.env
+client/coverage/
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/.vercel
+
+# Python (server)
+server/*.pyc
+server/*.pyo
+server/__pycache__/
+server/*.pyd
+
+# Pipenv (server)
+server/.venv
+server/Pipfile.lock
+
+# SQLite Database (server)
+server/*.sqlite3
+server/*.db
+
+# Flask-specific (server)
+server/instance/
+server/.env
+server/*.flaskenv
+
+# Testing (server)
+server/.pytest_cache/
+server/.coverage
+server/htmlcov/
+server/*.cover
+
+# OS-Specific
+.DS_Store
+Thumbs.db
