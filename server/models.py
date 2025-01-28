@@ -25,6 +25,13 @@ class User(db.Model, SerializerMixin):
     budgets = association_proxy('userbudgets', 'budget')
     serialize_rules = ("-transactions.user", "-userbudgets.user")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+           'password': self.password
+        }
+
     @validates('username')
     def validates_username(self, key, value):
         if len(value) < 10 or len(value) > 30:
