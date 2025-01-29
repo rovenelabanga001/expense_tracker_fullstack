@@ -75,6 +75,18 @@ class Transaction(db.Model, SerializerMixin):
     tag = db.relationship('Tag', uselist=False, back_populates='transactions', passive_deletes=True)
     
     serialize_rules = ("-user.transactions", "-tag.transactions")
+
+    def to_dict(self):
+        return{
+            "id":self.id,
+            "transaction_type": self.transaction_type,
+            "category":self.category,
+            "date": self.date.strftime("%Y-%m-%d"),
+            "description":self.description,
+            "amount":self.amount
+        }
+
+
     @validates('transaction_type')
     def validates_transaction_type(self, key, value):
         if value not in ["Income", "Expense"]:
