@@ -117,6 +117,33 @@ def user_by_id(id):
 
             return response
 
+@app.route('/users/<int:id>/transactions', methods=['GET'])
+def get_user_transactions(id):
+    transactions = Transaction.query.filter(Transaction.user_id == id).all()
+
+    if not transactions:
+        return make_response(
+            {"message": "No transactions found for this user"},
+            404
+        )
+    return jsonify([transaction.to_dict() for transaction in transactions]), 200
+
+
+@app.route('/users/<int:id>/budgets', methods=['GET'])
+def get_user_budgets(id):
+    user = User.query.get(id)
+    if not user:
+        return make_response(
+            {"message": "User not found"},
+            404
+        )
+    if not user.budgets:
+        return make_response(
+            {"message": "No budgets found for this user"},
+            404
+        )
+    return jsonify([budget.to_dict() for budget in user.budgets]), 200
+
 #transaction endpoints
 @app.route("/transactions", methods=['GET', 'POST'])
 def transactions():
@@ -200,7 +227,60 @@ def transaction_by_id(id):
                 {"message": "Transaction deleted"},
                 200
             )
-    
+        else:
+            return make_response(
+                {"error": f'Method {request.method} not allowed for this route'},
+                405
+            )
+
+#endpoints for budgets
+@app.route("/budgets", methods = ['GET', 'POST'])
+def budgets():
+    budgets = []
+    if request.method == 'GET':
+        for budget in Budget.query.all():
+            budget_dict = budget.to_dict()
+            budgets.append(budget_dict)
+
+        return make_response(
+            budgets,
+            200
+        )
+    elif request.method == 'POST':
+        data = request.get_json()
+
+        required_fields = ["name", "amount", "start_date", "end_date"]
+        if not all(field in data for field in required_fields):
+            return make_response(
+                {"message": "Missing required fields"},
+                400
+            )
+
+        try:
+            start_date = datetime.strptime(data["start_date"], "%Y-%m-%d").date()
+            end_date = datetime.strptime(data["end_date"], "%Y-%m-%d").date()
+
+            new_budget = Budget(
+                name = data['name'],
+                amount = data['amount'],
+                start_date = start_date,
+                end_date = end_date
+            )
+
+            db.session.add(new_budget)
+            db.session.commit()
+
+            return make_response(
+                new_budget.to_dict(),
+                201
+            )
+        except ValueError:
+            return make_response(
+                {"error": "Invalid date format. Use YYYY-MM-DD"},
+                400
+            )
+
+
 if __name__ == '__main__':
     app.run(port=555)
 

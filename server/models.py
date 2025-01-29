@@ -29,7 +29,7 @@ class User(db.Model, SerializerMixin):
         return {
             'id': self.id,
             'username': self.username,
-           'password': self.password
+           'password': self.password,
         }
 
     @validates('username')
@@ -83,7 +83,8 @@ class Transaction(db.Model, SerializerMixin):
             "category":self.category,
             "date": self.date.strftime("%Y-%m-%d"),
             "description":self.description,
-            "amount":self.amount
+            "amount":self.amount,
+            "user_id":self.user_id
         }
 
 
@@ -122,6 +123,15 @@ class Budget(db.Model, SerializerMixin):
 
     users = association_proxy('userbudgets', 'user')
     serialize_rules = ("-userbudgets.budget",)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "amount":self.amount,
+            "start_date":self.start_date,
+            "end_date": self.end_date
+        }
     def __repr__(self):
         return f'<Budget: {self.id}, name: {self.name}, amount: {self.amount}, start_date: {self.start_date}, end_date: {self.end_date}>'
 
