@@ -29,7 +29,6 @@ class User(db.Model, SerializerMixin):
         return {
             'id': self.id,
             'username': self.username,
-           'password': self.password,
         }
 
     @validates('username')

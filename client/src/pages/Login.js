@@ -1,7 +1,6 @@
 import React from "react";
 
-const Login = ({ setIsLoggedIn }) => {
-  console.log(setIsLoggedIn);
+const Login = ({ setIsLoggedIn, setUser }) => {
   const [showSignIn, setShowSignIn] = React.useState(true);
   const [formData, setFormData] = React.useState({
     username: "",
@@ -28,32 +27,42 @@ const Login = ({ setIsLoggedIn }) => {
     }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    fetch("https://expense-tracker-z3wf.onrender.com/users")
-      .then((response) => response.json())
-      .then((users) => {
-        const user = users.find(
-          (user) =>
-            user.username === formData.username &&
-            user.password === formData.password
-        );
-        if (user) {
-          setIsLoggedIn(true);
-          setErrorMessage("");
-          setFormData({
-            username: "",
-            password: "",
-          });
-        } else {
-          alert("Invalid username or password, please try again");
-          setErrorMessage("Invalid username or password, please try again");
-        }
-      })
-      .catch((error) => {
-        console.error("Error logging in", error);
-        setErrorMessage("An error occured please try again");
-      });
+    
+    try {
+      const response = await fetch(
+        `/users?username=${formData.username}&password=${formData.password}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch users");
+
+      const users = await response.json();
+      console.log("Fetched users", users);
+
+      if (users.length > 0) {
+        // If a matching user exists
+        const user = users[0]
+        console.log("User found:", user)
+        
+        setIsLoggedIn(true);
+        setUser({id: user.id, username: user.username})
+
+        localStorage.setItem("isLoggedIn", JSON.stringify(true));
+        localStorage.setItem("user", JSON.stringify({id: user.id, username: user.username}))
+        
+        setErrorMessage("");
+        setFormData({ username: "", password: "" });
+      } else {
+        throw new Error("Invalid username or password");
+      }
+    } catch (error) {
+      console.error("Error logging in", error);
+      setErrorMessage(
+        error.message === "Invalid username or password"
+          ? error.message
+          : "An error occurred, please try again"
+      );
+    }
   };
 
   const handleSignUp = (e) => {
@@ -69,7 +78,7 @@ const Login = ({ setIsLoggedIn }) => {
       password: formData.password,
     };
 
-    fetch("https://expense-tracker-z3wf.onrender.com/users", {
+    fetch("/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

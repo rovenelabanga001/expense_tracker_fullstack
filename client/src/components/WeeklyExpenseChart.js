@@ -29,7 +29,7 @@ const WeeklyExpenseChart = ({ transactions }) => {
   const expenseTransactions = transactions
     .filter(
       (transaction) =>
-        transaction.type.toLowerCase() === "expense" &&
+        transaction.transaction_type.toLowerCase() === "expense" &&
         new Date(transaction.date) >= sevenDaysAgo // Filter by date within the last 7 days
     )
     .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
@@ -88,9 +88,7 @@ const WeeklyExpenseChart = ({ transactions }) => {
             const date = tooltipItem.label; // Date for the hovered bar
             const category = categories[tooltipItem.dataIndex]; // Category for the hovered bar
             // Return custom information to display in the tooltip
-            return ` ${category} : Ksh ${amount.toFixed(
-              2
-            )}`;
+            return ` ${category} : Ksh ${amount.toFixed(2)}`;
           },
         },
       },

@@ -11,7 +11,7 @@ const TransactionList = ({
   const [searchTerm, setSearchTerm] = React.useState("");
   const handleClickDelete = (transactionId) => {
     fetch(
-      ` https://expense-tracker-z3wf.onrender.com/transactions/${transactionId}`,
+      ` /transactions/${transactionId}`,
       {
         method: "DELETE",
       }
@@ -27,10 +27,10 @@ const TransactionList = ({
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
-    const { type, category, date } = transaction;
+    const { transaction_type, category, date } = transaction;
     const searchText = searchTerm.toLowerCase();
     return (
-      type.toLowerCase().includes(searchText) ||
+      transaction_type.toLowerCase().includes(searchText) ||
       category.toLowerCase().includes(searchText) ||
       date.includes(searchText)
     );
@@ -43,7 +43,7 @@ const TransactionList = ({
   const transactionsToRender = filteredTransactions.map((transaction) => {
     return (
       <tr key={transaction.id}>
-        <td>{transaction.type}</td>
+        <td>{transaction.transaction_type}</td>
         <td>{transaction.category}</td>
         <td>{transaction.date}</td>
         <td>{transaction.amount}</td>

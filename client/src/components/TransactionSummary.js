@@ -2,15 +2,15 @@ import React from "react";
 import visibilityOn from "../assets/visibility_on.png";
 import visibilityOff from "../assets/visibility_off.png";
 
-const TransactionSummary = ({ transactions }) => {
+const TransactionSummary = ({ transactions = []}) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
   const totalIncome = transactions
-    .filter((transaction) => transaction.type.toLowerCase() === "income")
+    .filter((transaction) => transaction?.transaction_type?.toLowerCase() === "income")
     .reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
 
   const totalExpenses = transactions
-    .filter((transaction) => transaction.type.toLowerCase() === "expense")
+    .filter((transaction) => transaction?.transaction_type?.toLowerCase() === "expense")
     .reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
 
   const balance = totalIncome - totalExpenses;

@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
+import { useEffect } from "react";
 import { Outlet, Navigate, useRoutes } from "react-router-dom";
 import Login from "./pages/Login";
 import routes from "./routes";
@@ -8,9 +9,39 @@ import routes from "./routes";
 function App() {
   const [transactions, setTransactions] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(
-    () => JSON.parse(localStorage.getItem("isLoggedIn")) || false
-  );
+  const [user, setUser] = React.useState(null)
+  const [isLoggedIn, setIsLoggedIn] = React.useState(() => {
+    try {
+      const storedValue = localStorage.getItem("isLoggedIn");
+      return storedValue ? JSON.parse(storedValue) : false;
+    } catch (error) {
+      console.error("Error parsing isLoggedIn from localStorage", error);
+      return false;
+    }
+  });
+  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(user));
+    setIsLoggedIn(!!user);
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      const fetchTransactions = async () => {
+        try {
+          const response = await fetch(`/users/${user.id}/transactions`);
+          if (!response.ok) throw new Error("Failed to fetch transactions");
+          const data = await response.json();
+          setTransactions(data);
+        } catch (error) {
+          console.error("Error fetching transactions", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchTransactions();
+    }
+  }, [user]);
 
   const handleAddTransaction = (newTransaction) => {
     setTransactions([...transactions, newTransaction]);
@@ -24,17 +55,14 @@ function App() {
   };
 
   const handleEditTransaction = (updatedTransaction) => {
-    fetch(
-      `https://expense-tracker-z3wf.onrender.com/transactions/${updatedTransaction.id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(updatedTransaction),
-      }
-    )
+    fetch(`/transactions/${updatedTransaction.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(updatedTransaction),
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to update transaction");
@@ -53,18 +81,19 @@ function App() {
       .catch((error) => console.error("Error updating transaction", error));
   };
 
-  React.useEffect(() => {
-    fetch("https://expense-tracker-z3wf.onrender.com/transactions")
-      .then((response) => response.json())
-      .then((data) => {
-        setTransactions(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error getting transactions", error);
-        setLoading(false);
-      });
-  }, []);
+  // React.useEffect(() => {
+  //   fetch("/transactions")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log(data)
+  //       setTransactions(data);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error getting transactions", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
 
   React.useEffect(() => {
     // Update localStorage whenever isLoggedIn changes
@@ -75,15 +104,16 @@ function App() {
     return isLoggedIn ? children : <Navigate to="/" />;
   };
 
-  const routing = useRoutes(routes(setIsLoggedIn));
+  const routing = useRoutes(routes);
   return (
     <div className="App">
       <Navbar setIsLoggedIn={setIsLoggedIn} />
       {!isLoggedIn ? (
-        <Login setIsLoggedIn={setIsLoggedIn} />
+        <Login setIsLoggedIn={setIsLoggedIn} setUser={setUser}/>
       ) : !loading ? (
         <Outlet
           context={{
+            user,
             transactions,
             setTransactions,
             handleAddTransaction,

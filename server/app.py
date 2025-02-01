@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
-CORS(app)
+CORS(app) #
 migrate = Migrate(app, db)
 
 db.init_app(app)
@@ -33,7 +33,7 @@ def users():
         response = make_response(
             users,
             200
-        )
+        )   
         return response
 
     elif request.method == 'POST':
@@ -144,7 +144,7 @@ def get_user_budgets(id):
         )
     return jsonify([budget.to_dict() for budget in user.budgets]), 200
 
-#transaction endpoints
+#transactions endpoints
 @app.route("/transactions", methods=['GET', 'POST'])
 def transactions():
     if request.method == 'GET':
@@ -280,7 +280,76 @@ def budgets():
                 400
             )
 
+@app.route("/budgets/<int:id>", methods = ['GET', 'PATCH', 'DELETE'])
+def budget_by_id(id):
+    budget = Budget.query.filter(Budget.id == id).first()
+
+    if not budget:
+        return make_response(
+            {"message": "budget not founf"},
+            404
+        )
+
+    if request.method == 'GET':
+        return make_response(
+            budget.to_dict(),
+            200
+        )
+    elif request.method == 'PATCH':
+        data = request.get_json()
+
+        if "start_date" in data:
+            try:
+                data["start_date"] = datetime.strptime(data["start_date"], "%Y-%m-%d").date()
+            except ValueError:
+                return make_response(
+                    {"error": "Invalid start_date format. Use YYYY-MM-DD"},
+                    400
+                )
+
+        if "end_date" in data:
+            try:
+                data["end_date"] = datetime.strptime(data["end_date"], "%Y-%m-%d").date()
+            except ValueError:
+                return make_response(
+                    {"error": "Invalid end_date format. Use YYYY-MM-DD"},
+                     400
+                )
+
+        for key, value in data.items():
+            if hasattr(budget, key):
+                setattr(budget, key, value)
+
+        db.session.commit()
+
+        return make_response(
+            budget.to_dict(),
+            200
+        )
+
+    elif request.method == 'DELETE':
+        db.session.delete(budget)
+        db.session.commit()
+        return make_response (
+            {"message":"Budget deleted successfully"}
+        )
+
+@app.route('/budgets/<int:id>/users', methods = ['GET'])
+def get_budget_users(id):
+    budget = Budget.query.get(id)
+
+    if not budget:
+        return make_response(
+            {"error": "Budget not found"},
+            404
+        )
+
+    users = [user.to_dict() for user in budget.users]
+
+    return make_response(users, 200)
+
+
 
 if __name__ == '__main__':
-    app.run(port=555)
+    app.run(port=5555)
 
