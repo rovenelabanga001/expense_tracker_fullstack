@@ -67,8 +67,8 @@ class Transaction(db.Model, SerializerMixin):
     description = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
 
     user = db.relationship('User', uselist=False, back_populates='transactions')
     tag = db.relationship('Tag', uselist=False, back_populates='transactions', passive_deletes=True)
@@ -82,8 +82,7 @@ class Transaction(db.Model, SerializerMixin):
             "category":self.category,
             "date": self.date.strftime("%Y-%m-%d"),
             "description":self.description,
-            "amount":self.amount,
-            "user_id":self.user_id
+            "amount":self.amount
         }
 
 
@@ -119,7 +118,7 @@ class Budget(db.Model, SerializerMixin):
     end_date = db.Column(db.Date, nullable=False)
 
     userbudgets = db.relationship('UserBudget', back_populates='budget', cascade ="all, delete-orphan", passive_deletes=True)
-
+    #should be set to nullable=false
     users = association_proxy('userbudgets', 'user')
     serialize_rules = ("-userbudgets.budget",)
 
@@ -140,8 +139,8 @@ class UserBudget(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     contribution_amount = db.Column(db.Integer, nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
-    budget_id = db.Column(db.Integer, db.ForeignKey('budgets.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    budget_id = db.Column(db.Integer, db.ForeignKey('budgets.id', ondelete='CASCADE'), nullable=False)
 
     user = db.relationship('User', back_populates='userbudgets')
     budget = db.relationship('Budget', back_populates='userbudgets')
